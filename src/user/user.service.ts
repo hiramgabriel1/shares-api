@@ -1,6 +1,5 @@
 import {
     BadRequestException,
-    HttpCode,
     Injectable,
     UnauthorizedException
 } from '@nestjs/common';
@@ -74,9 +73,7 @@ export class UserService {
 
             return { token };
         } catch (error) {
-            // Manejo de errores asincrónico
-            throw error; // No es necesario envolver el error en un nuevo Error
+            throw error;
         }
     }
-
 }

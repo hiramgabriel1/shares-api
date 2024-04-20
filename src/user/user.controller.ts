@@ -8,13 +8,13 @@ import { AuthGuard } from 'src/guard/jwt.guard';
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    // private jwtService: JwtService
   ) { }
 
   @Post('auth/create-user')
   createUser(@Body() userData: UserDto) {
     return this.userService.createNewUser(userData)
   }
+
   @Post('auth/login-user')
   loginUser(@Body() userLogin: LoginDto) {
     return this.userService.userLogin(userLogin)
