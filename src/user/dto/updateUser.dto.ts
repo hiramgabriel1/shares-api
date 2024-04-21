@@ -7,4 +7,5 @@ export class UpdateUserDto implements UserDto{
     preferences: string[];
     description: string;
     tecnologies: string[];
+    role: string
 }

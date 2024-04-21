@@ -21,7 +21,7 @@ export class UserController {
   }
 
   @Put('user/:id')
-  updateUserInfo(@Param('id') id: number, userData: UserDto){
+  updateUserInfo(@Param('id') id: number, userData: any){
     return this.userService.updateUser(id, userData)
   }
 
