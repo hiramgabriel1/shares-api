@@ -13,7 +13,7 @@ import { constants } from 'src/constants/constants';
       global:true,
       secret: 'DJKEJDKLCJXCM??sd_dskldsjakdasdwdw34341298398894@eeklwew232dkdlmcvgejffejghUIHhJKhFTyfTYjkJLghGHJGJKGgkGkgGJHGgjkghjdFEWeqwESDOWERtYUiOndffvGGBNM ',
       signOptions:{ expiresIn: '1h' }
-    })
+    }),
   ],
   controllers: [UserController],
   providers: [UserService],

@@ -22,4 +22,14 @@ export class UserEntity {
 
     @Column('simple-array')
     tecnologies: string[];
+
+    // ? posts created
+
+    // ? comments created
+
+    // ? posts saveds
+
+    // ? groups created
+
+    // ? events created
 }

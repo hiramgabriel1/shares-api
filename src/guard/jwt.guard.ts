@@ -6,19 +6,15 @@ import { constants } from 'src/constants/constants';
 @Injectable()
 export class AuthGuard implements CanActivate {
 
-    constructor(private readonly jwtService: JwtService) {
-
-    }
+    constructor(private readonly jwtService: JwtService) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
 
         const request = context.switchToHttp().getRequest();
         const token = this.extractToken(request);
 
-        if (!token) {
-            throw new UnauthorizedException('Token is invalid or empty')
-        }
-
+        if (!token) throw new UnauthorizedException('Token is invalid or empty')
+        
         try {
             const payload = await this.jwtService.verifyAsync(
                 token,
