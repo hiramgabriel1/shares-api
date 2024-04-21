@@ -7,7 +7,7 @@ import { AuthGuard } from 'src/guard/jwt.guard';
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) { }
 
-  @Post('/create-comment/:userId/:postId')
+  @Post('/create-comment/userId/:userId/postId/:postId')
   @UseGuards(AuthGuard)
   createComment(
     @Param('postId') postId: number,

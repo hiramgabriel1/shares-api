@@ -4,7 +4,7 @@ import { CommentEntity } from 'src/comments/entities/comments.entity';
 
 @Entity()
 export class UserEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn('increment')
   id: number;
 
   @Column('text')

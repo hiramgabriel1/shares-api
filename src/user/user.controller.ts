@@ -45,4 +45,9 @@ export class UserController {
   users(){
     return this.userService.renderUsers()
   }
+
+  @Get('users/posts')
+  usersWithPost(){
+    return this.userService.renderUsersWithPosts()
+  }
 }

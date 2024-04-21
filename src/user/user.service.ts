@@ -30,8 +30,28 @@ export class UserService {
       throw new BadRequestException('El usuario ya existe');
   }
 
-  async renderUsers(){
-    return await this.userRepository.find()
+  async renderUsersWithPosts() {
+    const findPosts = await this.userRepository.find({
+      relations: ['posts', 'comments'],
+    })
+
+    console.log(findPosts);
+    
+    let p = findPosts.filter((post) => post.posts.length >= 1)
+    
+    return p
+  }
+
+  async renderUsers() {
+    const findPosts = await this.userRepository.find({
+      relations: ['posts', 'comments'],
+    })
+
+    // console.log(findPosts);
+    
+    // let p = findPosts.filter((post) => post.posts.length >= 1)
+    
+    return findPosts
   }
 
   async sendEmailConfirmUser(email: string) {

@@ -22,13 +22,30 @@ export class PostsService {
         private userRepository: Repository<UserEntity>,
     ) { }
 
-    async getUsersWithPosts() {
-        const users = await this.userRepository.find({
-            relations: ['posts', 'comments'],
+    // todo: private methods (only development)
+
+    async getPostWithComments() {
+        const postsWithComments = await this.postRepository.find({
+            relations: ['comments'],
         });
 
-        return users;
+        let postsComments = postsWithComments.filter(posts => posts.comments.length >= 1)
+
+        return {
+            message: 'posts con comentarios',
+            details: postsComments
+        };
     }
+
+    async getAllPosts() {
+        const posts = await this.postRepository.find({
+            relations: ['comments'],
+        });
+
+        return posts;
+    }
+
+    // todo: public methods
 
     async validatePostAndUser(postId: number, userId: number) {
         try {
@@ -40,8 +57,11 @@ export class PostsService {
                 relations: ['user'],
             });
 
-            if (post && post.user && post.user.id === userId) {
-                console.log(`el usuario que creo este post fue: ${post.user.id}`);
+            if (
+                post && post.user && post.user.id === userId) {
+                console.log(
+                    `el usuario que creo este post fue: ${post.user.id}`
+                );
 
                 console.log(post);
 
@@ -100,18 +120,17 @@ export class PostsService {
             );
     }
 
-    async postContent(userId: number, post: PostDto) {
+    async postContent(userId: number, postId: number) {
         const searchPostExists = await this.postRepository.findOne({
-            where: [
-                { title: post.title },
-                { description: post.description }],
+            where: {
+                id: postId,
+            },
+            relations: ['user'],
         });
 
-        if (!searchPostExists)
-            throw new BadRequestException(
-                'el post que   quieres modificar no existe',
-            );
-
+        if (!searchPostExists || searchPostExists.user.id !== userId) {
+            throw new NotFoundException('El post que quieres modificar no existe');
+        }
     }
 
     async createPost(userId: any, postData: PostDto) {
@@ -120,7 +139,7 @@ export class PostsService {
 
             const response = await this.validateContentPost(postData);
 
-            if (response !== 'finded') {
+            if (response === 'finded') {
                 throw new BadRequestException('Contenido inapropiado detectado');
             }
 
@@ -146,31 +165,30 @@ export class PostsService {
                 details: createdPost,
                 postId: createdPost.id,
             };
+
         } catch (error) {
             throw new BadRequestException(error.message);
         }
     }
 
-    async editPostUser(id: number, postData: PostDto) {
+    async editPostUser(userId: number, postId: number, postData: PostDto) {
         try {
-            // ! validar si el post lo creo el usuario o no, si el si lo creo entonces permitir editar, sino, no permitir alaburguer
-            await this.postContent(id, postData);
-            await this.titleAlreadyExistsInDatabase(postData.title);
+            await this.postContent(userId, postId);
 
-            const newData = {
-                id: id,
-                title: postData.title,
-                description: postData.description,
-            };
+            const existingPost = await this.postRepository.findOne({
+                where: {
+                    id: postId
+                }
+            });
 
-            const instancePost = this.postRepository.create(newData);
-            const updatePost = await this.postRepository.save(instancePost);
+            existingPost.title = postData.title;
+            existingPost.description = postData.description;
 
-            return {
-                message: 'updated',
-                postUpdated: instancePost,
-                details: updatePost,
-            };
+            const updatedPost = await this.postRepository.save(existingPost);
+
+            console.log(existingPost);
+            
+            return updatedPost
         } catch (error) {
             throw new BadRequestException(error);
         }
@@ -178,9 +196,11 @@ export class PostsService {
 
     async deletePostUser(userId: number, postId: number) {
         try {
-            const data = await this.validatePostAndUser(postId, userId);
+            await this.validatePostAndUser(postId, userId);
 
-            return data;
+            await this.postRepository.delete(postId)
+
+            return 'post deleted successfully'
         } catch (error) {
             throw new BadRequestException(error);
         }
