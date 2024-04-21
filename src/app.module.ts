@@ -12,6 +12,8 @@ import { GroupsModule } from './groups/groups.module';
 import { AdminModule } from './admin/admin.module';
 import { CommentsModule } from './comments/comments.module';
 import { ReportsModule } from './reports/reports.module';
+import { PostEntity } from './posts/entities/post.entity';
+import { CommentEntity } from './comments/entities/comments.entity';
 
 @Module({
   imports: [
@@ -28,10 +30,10 @@ import { ReportsModule } from './reports/reports.module';
       username: process.env.DATABASE_USERNAME,
       password: 'loqueseaalaburguer',
       autoLoadEntities: true,
-      entities: [UserEntity],
+      entities: [UserEntity, PostEntity, CommentEntity],
       synchronize: true, // ? sincroniza los cambios de las entities
     }),
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, PostEntity, CommentEntity]),
 
     UserModule,
     PostsModule,

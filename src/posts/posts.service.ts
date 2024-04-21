@@ -18,7 +18,9 @@ export class PostsService {
     ) { }
 
     async getUsersWithPosts() {
-        const users = await this.userRepository.find({ relations: ['posts'] });
+        const users = await this.userRepository.find({ 
+            relations: ['posts', 'comments'] 
+        });
 
         return users;
     }

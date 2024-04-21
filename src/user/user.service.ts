@@ -137,12 +137,13 @@ export class UserService {
     if (!find) throw new BadRequestException('user is not found');
 
     const findPosts = await this.userRepository.findOne({
-      relations: ['posts'],
+      relations: ['posts', 'comments'],
       where: {
         id: userId
       }
     })
 
     return findPosts
+
   }
 }

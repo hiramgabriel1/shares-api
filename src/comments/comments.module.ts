@@ -5,10 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommentEntity } from './entities/comments.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { constants } from 'src/constants/constants';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { PostEntity } from 'src/posts/entities/post.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CommentEntity]),
+    TypeOrmModule.forFeature([CommentEntity, UserEntity, PostEntity]),
     JwtModule.register({
       global: true,
       secret: constants.secret,

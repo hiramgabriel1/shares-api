@@ -6,10 +6,11 @@ import { UserEntity } from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { constants } from 'src/constants/constants';
 import { PostEntity } from 'src/posts/entities/post.entity';
+import { CommentEntity } from 'src/comments/entities/comments.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity, PostEntity]),
+    TypeOrmModule.forFeature([UserEntity, PostEntity, CommentEntity]),
     JwtModule.register({
       global: true,
       secret: constants.secret,
