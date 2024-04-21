@@ -14,6 +14,18 @@ import { CommentsModule } from './comments/comments.module';
 import { ReportsModule } from './reports/reports.module';
 import { PostEntity } from './posts/entities/post.entity';
 import { CommentEntity } from './comments/entities/comments.entity';
+import { CommentsController } from './comments/comments.controller';
+import { PostsController } from './posts/posts.controller';
+import { CommentsService } from './comments/comments.service';
+import { PostsService } from './posts/posts.service';
+import { GroupsController } from './groups/groups.controller';
+import { ReportsController } from './reports/reports.controller';
+import { EventsController } from './events/events.controller';
+import { EventsService } from './events/events.service';
+import { ReportsService } from './reports/reports.service';
+import { AdminService } from './admin/admin.service';
+import { AdminController } from './admin/admin.controller';
+import { GroupsService } from './groups/groups.service';
 
 @Module({
   imports: [
@@ -44,7 +56,24 @@ import { CommentEntity } from './comments/entities/comments.entity';
     ReportsModule,
   ],
 
-  controllers: [UserController],
-  providers: [UserService],
+  controllers: [
+    UserController,
+    CommentsController,
+    PostsController,
+    GroupsController,
+    ReportsController,
+    EventsController,
+    AdminController
+  ],
+  
+  providers: [
+    UserService,
+    CommentsService,
+    PostsService,
+    EventsService,
+    ReportsService,
+    AdminService,
+    GroupsService,
+  ],
 })
-export class AppModule { }
+export class AppModule {}
