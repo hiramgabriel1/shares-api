@@ -187,7 +187,7 @@ export class PostsService {
             const updatedPost = await this.postRepository.save(existingPost);
 
             console.log(existingPost);
-            
+
             return updatedPost
         } catch (error) {
             throw new BadRequestException(error);
@@ -197,10 +197,10 @@ export class PostsService {
     async deletePostUser(userId: number, postId: number) {
         try {
             await this.validatePostAndUser(postId, userId);
-
             await this.postRepository.delete(postId)
 
             return 'post deleted successfully'
+            
         } catch (error) {
             throw new BadRequestException(error);
         }

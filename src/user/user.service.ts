@@ -21,9 +21,11 @@ export class UserService {
     private jwtService: JwtService,
   ) { }
 
-  async validateIfUserExists(user: UserDto) {
+  async validateIfUserExists(userId: number) {
     const userIsAlreadyExistsInDatabase = await this.userRepository.findOne({
-      where: [{ email: user.email }, { username: user.username }],
+      where: {
+        id: userId
+      },
     });
 
     if (userIsAlreadyExistsInDatabase)
@@ -36,9 +38,9 @@ export class UserService {
     })
 
     console.log(findPosts);
-    
+
     let p = findPosts.filter((post) => post.posts.length >= 1)
-    
+
     return p
   }
 
@@ -48,9 +50,9 @@ export class UserService {
     })
 
     // console.log(findPosts);
-    
+
     // let p = findPosts.filter((post) => post.posts.length >= 1)
-    
+
     return findPosts
   }
 
@@ -70,7 +72,7 @@ export class UserService {
     }
   }
 
-  async createNewUser(userData: UserDto) {
+  async createNewUser(userData: any) {
     try {
       const { email } = userData;
       await this.validateIfUserExists(userData);
@@ -131,21 +133,29 @@ export class UserService {
     }
   }
 
+  // ! pendiente
   async updateUser(userId: number, updateUser: UpdateUserDto) {
     try {
-      await this.validateIfUserExists(updateUser);
+      await this.validateIfUserExists(userId);
 
-      const instanceUserToUpdate = this.userRepository.update(
-        userId,
-        updateUser,
-      );
+      const newDataUser = {
+        username: updateUser.username,
+        email: updateUser.email,
+        password: updateUser.password,
+        preferences: updateUser.preferences,
+        description: updateUser.description,
+        tecnologies: updateUser.tecnologies,
+        role: updateUser.role
+      }
+
+      const instanceUserToUpdate = await this.userRepository.update(userId, newDataUser);
 
       if (!instanceUserToUpdate)
         throw new BadRequestException(`error al actualizar ${userId}`);
 
       return {
         message: `usuario actualizado ${userId}`,
-        details: updateUser,
+        details: instanceUserToUpdate,
       };
     } catch (error) {
       console.log(error);
