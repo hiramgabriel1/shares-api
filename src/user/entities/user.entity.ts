@@ -1,38 +1,32 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { PostEntity } from 'src/posts/entities/post.entity';
 
 @Entity()
 export class UserEntity {
-    @PrimaryGeneratedColumn('increment')
-    id: number;
+  @PrimaryGeneratedColumn('increment')
+  id: number;
 
-    @Column('text')
-    username: string;
+  @Column('text')
+  username: string;
 
-    @Column('text')
-    email: string;
+  @Column('text')
+  email: string;
 
-    @Column('text')
-    password: string;
+  @Column('text')
+  password: string;
 
-    @Column('simple-array')
-    preferences: string[];
+  @Column('simple-array')
+  preferences: string[];
 
-    @Column('text')
-    description: string;
+  @Column('text')
+  description: string;
 
-    @Column('simple-array')
-    tecnologies: string[];
+  @Column('simple-array')
+  tecnologies: string[];
 
-    @Column({ default: 'normal-user' })
-    role: string
+  @Column({ default: 'normal-user' })
+  role: string;
 
-    // ? posts created
-
-    // ? comments created
-
-    // ? posts saveds
-
-    // ? groups created
-
-    // ? events created
+  @OneToMany(() => PostEntity, (post) => post.user)
+  posts: PostEntity[];
 }

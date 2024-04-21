@@ -5,16 +5,22 @@ import { Repository } from 'typeorm';
 import { PostEntity } from './entities/post.entity';
 import { G4F } from 'g4f';
 import { promptsContent } from 'src/global/prompts';
+import { UserEntity } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class PostsService {
     constructor(
         @InjectRepository(PostEntity)
         private postRepository: Repository<PostEntity>,
+
+        @InjectRepository(UserEntity)
+        private userRepository: Repository<UserEntity>
     ) { }
 
-    async getPosts() {
-        return await this.postRepository.find()
+    async getUsersWithPosts() {
+        const users = await this.userRepository.find({ relations: ['posts'] });
+
+        return users;
     }
 
     async validateContentPost(contentPost: PostDto) {
@@ -34,7 +40,7 @@ export class PostsService {
 
             const options = {
                 model: 'gpt-4',
-                debug: true,
+                // debug: true,
             };
 
             return await g4f.chatCompletion(messages, options);
@@ -67,27 +73,39 @@ export class PostsService {
         // ! validar si el post si pertenece al usuario que intenta modificar
     }
 
-    async createPost(postData: PostDto) {
+    async createPost(userId: any, postData: PostDto) {
         try {
-            await this.titleAlreadyExistsInDatabase(postData.title)
+            await this.titleAlreadyExistsInDatabase(postData.title);
+
             const response = await this.validateContentPost(postData);
-
-            if (response === 'finded') throw new BadRequestException('Contenido inapropiado detectado')
-
-            const createInstancePost = this.postRepository.create(postData)
-
-            if (createInstancePost) {
-                await this.postRepository.save(createInstancePost)
-                return {
-                    message: 'post created!',
-                    details: createInstancePost,
-                    postId: this.postRepository.getId
-                }
+            if (response !== 'finded') {
+                throw new BadRequestException('Contenido inapropiado detectado');
             }
 
-            return 'error en crear el post'
+            // Obtener el usuario que creó el post
+            const user = await this.userRepository.findOne({
+                where: {
+                    id: userId
+                }
+            });
+
+            if (!user) throw new BadRequestException('Usuario no encontrado');
+
+            // Crear una instancia del post y asignar el usuario correspondiente
+            const newPost = this.postRepository.create({
+                user: user,
+                ...postData,
+            });
+
+            const createdPost = await this.postRepository.save(newPost);
+
+            return {
+                message: 'Post creado exitosamente',
+                details: createdPost,
+                postId: createdPost.id,
+            };
         } catch (error) {
-            throw new BadRequestException(error);
+            throw new BadRequestException(error.message);
         }
     }
 
@@ -108,7 +126,7 @@ export class PostsService {
 
             return {
                 message: 'updated',
-                postId: id,
+                // postId: id,
                 postUpdated: instancePost,
                 details: updatePost
             }
@@ -139,7 +157,7 @@ export class PostsService {
                 }
             }
         } catch (error) {
-            console.error(error)
+            throw new BadRequestException(error)
         }
     }
 }

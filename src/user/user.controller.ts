@@ -37,7 +37,7 @@ export class UserController {
   }
 
   @Get('user/:id')
-  findUser(@Param('id') id: any) {
+  findUser(@Param('id') id: number) {
     return this.userService.getUserInfo(id)
   }
 }

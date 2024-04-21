@@ -10,14 +10,16 @@ export class PostsController {
   ) { }
 
   @Get()
-  getPost(){
-    return this.postsService.getPosts()
+  getPost() {
+    return this.postsService.getUsersWithPosts()
   }
 
-  @Post('/create-post')
+  @Post('/create-post/:userId')
   @UseGuards(AuthGuard)
-  createPostUser(@Body() postData: PostDto) {
-    return this.postsService.createPost(postData)
+  createPostUser(
+    @Param('userId') userId: any,
+    @Body() postData: PostDto) {
+    return this.postsService.createPost(userId, postData)
   }
 
   @Put('/edit-post/:id')
