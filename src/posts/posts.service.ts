@@ -120,18 +120,17 @@ export class PostsService {
             );
     }
 
-    async postContent(userId: number, post: PostDto) {
+    async postContent(userId: number, postId: number) {
         const searchPostExists = await this.postRepository.findOne({
-            where: [
-                { title: post.title },
-                { description: post.description }],
+            where: {
+                id: postId,
+            },
+            relations: ['user'],
         });
 
-        if (!searchPostExists)
-            throw new BadRequestException(
-                'el post que   quieres modificar no existe',
-            );
-
+        if (!searchPostExists || searchPostExists.user.id !== userId) {
+            throw new NotFoundException('El post que quieres modificar no existe');
+        }
     }
 
     async createPost(userId: any, postData: PostDto) {
@@ -172,26 +171,24 @@ export class PostsService {
         }
     }
 
-    async editPostUser(id: number, postData: PostDto) {
+    async editPostUser(userId: number, postId: number, postData: PostDto) {
         try {
-            // ! validar si el post lo creo el usuario o no, si el si lo creo entonces permitir editar, sino, no permitir alaburguer
-            await this.postContent(id, postData);
-            await this.titleAlreadyExistsInDatabase(postData.title);
+            await this.postContent(userId, postId);
 
-            const newData = {
-                id: id,
-                title: postData.title,
-                description: postData.description,
-            };
+            const existingPost = await this.postRepository.findOne({
+                where: {
+                    id: postId
+                }
+            });
 
-            const instancePost = this.postRepository.create(newData);
-            const updatePost = await this.postRepository.save(instancePost);
+            existingPost.title = postData.title;
+            existingPost.description = postData.description;
 
-            return {
-                message: 'updated',
-                postUpdated: instancePost,
-                details: updatePost,
-            };
+            const updatedPost = await this.postRepository.save(existingPost);
+
+            console.log(existingPost);
+            
+            return updatedPost
         } catch (error) {
             throw new BadRequestException(error);
         }
@@ -201,7 +198,7 @@ export class PostsService {
         try {
             await this.validatePostAndUser(postId, userId);
 
-            const deletePost = await this.postRepository.delete(postId)
+            await this.postRepository.delete(postId)
 
             return 'post deleted successfully'
         } catch (error) {

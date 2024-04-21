@@ -15,7 +15,7 @@ import { AuthGuard } from 'src/guard/jwt.guard';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(private readonly postsService: PostsService) { }
 
   @Get()
   getPost() {
@@ -33,10 +33,14 @@ export class PostsController {
     return this.postsService.createPost(userId, postData);
   }
 
-  @Put('/edit-post/:id')
+  @Put('/edit-post/user/:userId/post/:postId')
   @UseGuards(AuthGuard)
-  editPostUser(@Param('id') id: number, @Body() postData: PostDto) {
-    return this.postsService.editPostUser(id, postData);
+  editPostUser(
+    @Param('userId') userId: number,
+    @Param('postId') postId: number,
+    @Body() postData: PostDto) {
+
+    return this.postsService.editPostUser(userId, postId, postData);
   }
 
   @Delete('/delete-post/user/:userId/postId/:postId')
