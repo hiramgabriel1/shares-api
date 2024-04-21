@@ -1,6 +1,6 @@
-import { CreatePost } from './create.post';
+import { PostDto } from './create.post';
 
-export class UpdatePost implements CreatePost {
+export class UpdatePost implements PostDto {
   title: string;
   description: string;
 }

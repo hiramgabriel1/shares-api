@@ -19,7 +19,7 @@ export class UserService {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async validateIfUserExists(user: UserDto) {
     const userIsAlreadyExistsInDatabase = await this.userRepository.findOne({
@@ -96,7 +96,7 @@ export class UserService {
       const payload = {
         name: userFindToLogin.username,
         email: userFindToLogin.email,
-        roleUser: userFindToLogin.role
+        roleUser: userFindToLogin.role,
       };
 
       return {
@@ -116,8 +116,9 @@ export class UserService {
         updateUser,
       );
 
-      if (!instanceUserToUpdate) throw new BadRequestException(`error al actualizar ${userId}`);
-      
+      if (!instanceUserToUpdate)
+        throw new BadRequestException(`error al actualizar ${userId}`);
+
       return {
         message: `usuario actualizado ${userId}`,
         details: updateUser,

@@ -4,13 +4,14 @@ import { PostsController } from './posts.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostEntity } from './entities/post.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { constants } from 'src/constants/constants';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([PostEntity]),
     JwtModule.register({
       global:true,
-      secret: 'DJKEJDKLCJXCM??sd_dskldsjakdasdwdw34341298398894@eeklwew232dkdlmcvgejffejghUIHhJKhFTyfTYjkJLghGHJGJKGgkGkgGJHGgjkghjdFEWeqwESDOWERtYUiOndffvGGBNM',
+      secret: constants.secret,
       signOptions:{ expiresIn: '24h' }
     }),
   ],
