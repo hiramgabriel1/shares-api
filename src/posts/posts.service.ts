@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { PostEntity } from './entities/post.entity';
 import { G4F } from 'g4f';
 import { promptsContent } from 'src/global/prompts';
-import { UpdatePostDto } from './dto/update.post';
 
 @Injectable()
 export class PostsService {
@@ -13,6 +12,10 @@ export class PostsService {
         @InjectRepository(PostEntity)
         private postRepository: Repository<PostEntity>,
     ) { }
+
+    async getPosts() {
+        return await this.postRepository.find()
+    }
 
     async validateContentPost(contentPost: PostDto) {
         const g4f = new G4F();
@@ -48,7 +51,7 @@ export class PostsService {
             }
         })
 
-        if (searchTitleInDatabase) throw new BadRequestException('el titulo del post ya existe')
+        if (searchTitleInDatabase) throw new BadRequestException('el titulo del post ya existe, intenta con uno nuevo')
     }
 
     async postContent(userId: number, post: PostDto) {
@@ -59,7 +62,7 @@ export class PostsService {
             ]
         })
 
-        if (!searchPostExists) throw new BadRequestException('el post que quieres modificar no existe')
+        if (!searchPostExists) throw new BadRequestException('el post que   quieres modificar no existe')
 
         // ! validar si el post si pertenece al usuario que intenta modificar
     }
@@ -88,18 +91,55 @@ export class PostsService {
         }
     }
 
-    async editPostUser(id: any, postData: PostDto, userID: any) {
+    async editPostUser(id: number, postData: PostDto) {
         try {
-            console.log(userID);
-            
-           return userID
+            // ! validar si el post lo creo el usuario o no, si el si lo creo entonces permitir editar, sino, no permitir alaburguer
+            await this.postContent(id, postData)
+            await this.titleAlreadyExistsInDatabase(postData.title)
 
+            const newData = {
+                id: id,
+                title: postData.title,
+                description: postData.description
+            }
+
+            const instancePost = this.postRepository.create(newData)
+            const updatePost = await this.postRepository.save(instancePost)
+
+            return {
+                message: 'updated',
+                postId: id,
+                postUpdated: instancePost,
+                details: updatePost
+            }
         } catch (error) {
             throw new BadRequestException(error)
         }
     }
 
-    async deletePostUser(postId: number){
-        return postId
+    async deletePostUser(postId: any) {
+        try {
+            // ! validar si el post lo creo el usuario o no, si el si lo creo entonces permitir eliminar, sino, no permitir alaburguer
+
+            const searchPostId = await this.postRepository.findOne({
+                where: {
+                    id: postId
+                }
+            })
+
+            console.log(searchPostId);
+
+            if (!searchPostId || searchPostId == null) throw new ForbiddenException('NO EXISTE EL POST')
+
+            if (searchPostId) {
+                await this.postRepository.delete(postId)
+                return {
+                    message: 'post deleted',
+                    details: searchPostId
+                }
+            }
+        } catch (error) {
+            console.error(error)
+        }
     }
 }
