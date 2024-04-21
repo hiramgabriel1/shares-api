@@ -1,12 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PostDto } from './dto/create.post';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PostEntity } from './entities/post.entity';
 import { G4F } from 'g4f';
 import { promptsContent } from 'src/global/prompts';
-import { error } from 'console';
-import { throwError } from 'rxjs';
+import { UpdatePostDto } from './dto/update.post';
 
 @Injectable()
 export class PostsService {
@@ -52,6 +51,19 @@ export class PostsService {
         if (searchTitleInDatabase) throw new BadRequestException('el titulo del post ya existe')
     }
 
+    async postContent(userId: number, post: PostDto) {
+        const searchPostExists = await this.postRepository.findOne({
+            where: [
+                { title: post.title },
+                { description: post.description }
+            ]
+        })
+
+        if (!searchPostExists) throw new BadRequestException('el post que quieres modificar no existe')
+
+        // ! validar si el post si pertenece al usuario que intenta modificar
+    }
+
     async createPost(postData: PostDto) {
         try {
             await this.titleAlreadyExistsInDatabase(postData.title)
@@ -70,9 +82,20 @@ export class PostsService {
                 }
             }
 
-            return error
+            return 'error en crear el post'
         } catch (error) {
             throw new BadRequestException(error);
+        }
+    }
+
+    async editPostUser(id: any, postData: PostDto, userID: any) {
+        try {
+            console.log(userID);
+            
+           return userID
+
+        } catch (error) {
+            throw new BadRequestException(error)
         }
     }
 }

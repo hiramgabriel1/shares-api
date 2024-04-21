@@ -3,7 +3,8 @@ import { ExtractJwt, Strategy } from "passport-jwt";
 import { constants } from "src/constants/constants";
 
 export class JwtStrategy extends PassportStrategy(Strategy) {
-    constructor() {
+    constructor(
+    ) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
@@ -13,6 +14,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     async validate(payload: any) {
         console.log(payload);
+        console.log(payload.id);
+
         return { userId: payload.id, username: payload.username, role: payload.role }
     }
 }

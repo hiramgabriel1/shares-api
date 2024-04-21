@@ -26,6 +26,8 @@ export class UserController {
     @Request()
     req,
   ) {
+    console.log(req.user);
+    
     return req.user;
   }
 

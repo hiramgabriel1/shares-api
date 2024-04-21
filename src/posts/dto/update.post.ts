@@ -1,6 +1,6 @@
 import { PostDto } from './create.post';
 
-export class UpdatePost implements PostDto {
+export class UpdatePostDto implements PostDto {
   title: string;
   description: string;
 }
