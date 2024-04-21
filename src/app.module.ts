@@ -10,6 +10,8 @@ import { PostsModule } from './posts/posts.module';
 import { EventsModule } from './events/events.module';
 import { GroupsModule } from './groups/groups.module';
 import { AdminModule } from './admin/admin.module';
+import { CommentsModule } from './comments/comments.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { AdminModule } from './admin/admin.module';
     EventsModule,
     GroupsModule,
     AdminModule,
+    CommentsModule,
+    ReportsModule,
   ],
 
   controllers: [UserController],

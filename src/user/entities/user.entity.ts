@@ -23,6 +23,9 @@ export class UserEntity {
     @Column('simple-array')
     tecnologies: string[];
 
+    @Column({ default: 'normal-user' })
+    role: string
+
     // ? posts created
 
     // ? comments created

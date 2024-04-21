@@ -35,9 +35,9 @@ export class UserService {
       const info = await transporter.sendMail({
         from: `"Maddison Foo Koch 👻" <${process.env.EMAIL_PROVIDER}>`,
         to: `${email}`,
-        subject: 'Hello ✔', 
-        text: 'Hello world?', 
-        html: '<b>Hello world?</b>', 
+        subject: 'Hello ✔',
+        text: 'Hello world?',
+        html: '<b>Hello world?</b>',
       });
 
       console.log('Message sent: %s', info.messageId);
@@ -96,9 +96,12 @@ export class UserService {
       const payload = {
         name: userFindToLogin.username,
         email: userFindToLogin.email,
+        roleUser: userFindToLogin.role
       };
 
-      return await this.jwtService.signAsync(payload);
+      return {
+        token: await this.jwtService.signAsync(payload),
+      };
     } catch (error) {
       throw error;
     }
@@ -113,10 +116,8 @@ export class UserService {
         updateUser,
       );
 
-      if (!instanceUserToUpdate) {
-        throw new BadRequestException(`error al actualizar ${userId}`);
-      }
-
+      if (!instanceUserToUpdate) throw new BadRequestException(`error al actualizar ${userId}`);
+      
       return {
         message: `usuario actualizado ${userId}`,
         details: updateUser,
