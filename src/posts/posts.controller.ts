@@ -28,11 +28,14 @@ export class PostsController {
     return this.postsService.editPostUser(id, postData)
   }
 
-  @Delete('/delete-post/:postId')
+  @Delete('/delete-post/user/:userId/postId/:postId')
   @UseGuards(AuthGuard)
-  deletePostUser(@Param('postId') postId: any, @Req() req) {
-    const userId = req.user
+  deletePostUser(
+    @Param('postId') postId: any,
+    @Param('userId') userId: number,
+  ) {
+    // const userId = req.user
 
-    return this.postsService.deletePostUser(postId)
+    return this.postsService.deletePostUser(userId, postId)
   }
 }

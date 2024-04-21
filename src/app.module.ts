@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
-import configuration from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './user/entities/user.entity';
 import { UserController } from './user/user.controller';
@@ -26,6 +25,7 @@ import { ReportsService } from './reports/reports.service';
 import { AdminService } from './admin/admin.service';
 import { AdminController } from './admin/admin.controller';
 import { GroupsService } from './groups/groups.service';
+import configuration from './config/configuration';
 
 @Module({
   imports: [
