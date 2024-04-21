@@ -98,4 +98,8 @@ export class PostsService {
             throw new BadRequestException(error)
         }
     }
+
+    async deletePostUser(postId: number){
+        return postId
+    }
 }
