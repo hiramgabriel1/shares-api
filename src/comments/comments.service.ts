@@ -45,7 +45,7 @@ export class CommentsService {
             const savedComment = await this.commentRepository.save(newComment);
 
             return {
-                message: `Comentario creado en el post ${searchPost.id}`,
+                message: `Comentario creado`,
                 comment: savedComment,
             };
         } catch (error) {

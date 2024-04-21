@@ -22,13 +22,30 @@ export class PostsService {
         private userRepository: Repository<UserEntity>,
     ) { }
 
-    async getUsersWithPosts() {
-        const users = await this.userRepository.find({
-            relations: ['posts', 'comments'],
+    // todo: private methods (only development)
+
+    async getPostWithComments() {
+        const postsWithComments = await this.postRepository.find({
+            relations: ['comments'],
         });
 
-        return users;
+        let postsComments = postsWithComments.filter(posts => posts.comments.length >= 1)
+
+        return {
+            message: 'posts con comentarios',
+            details: postsComments
+        };
     }
+
+    async getAllPosts() {
+        const posts = await this.postRepository.find({
+            relations: ['comments'],
+        });
+
+        return posts;
+    }
+
+    // todo: public methods
 
     async validatePostAndUser(postId: number, userId: number) {
         try {
@@ -40,8 +57,11 @@ export class PostsService {
                 relations: ['user'],
             });
 
-            if (post && post.user && post.user.id === userId) {
-                console.log(`el usuario que creo este post fue: ${post.user.id}`);
+            if (
+                post && post.user && post.user.id === userId) {
+                console.log(
+                    `el usuario que creo este post fue: ${post.user.id}`
+                );
 
                 console.log(post);
 
@@ -120,7 +140,7 @@ export class PostsService {
 
             const response = await this.validateContentPost(postData);
 
-            if (response !== 'finded') {
+            if (response === 'finded') {
                 throw new BadRequestException('Contenido inapropiado detectado');
             }
 
@@ -146,6 +166,7 @@ export class PostsService {
                 details: createdPost,
                 postId: createdPost.id,
             };
+
         } catch (error) {
             throw new BadRequestException(error.message);
         }
@@ -178,9 +199,11 @@ export class PostsService {
 
     async deletePostUser(userId: number, postId: number) {
         try {
-            const data = await this.validatePostAndUser(postId, userId);
+            await this.validatePostAndUser(postId, userId);
 
-            return data;
+            const deletePost = await this.postRepository.delete(postId)
+
+            return 'post deleted successfully'
         } catch (error) {
             throw new BadRequestException(error);
         }
