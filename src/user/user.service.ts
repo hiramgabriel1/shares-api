@@ -30,6 +30,10 @@ export class UserService {
       throw new BadRequestException('El usuario ya existe');
   }
 
+  async renderUsers(){
+    return await this.userRepository.find()
+  }
+
   async sendEmailConfirmUser(email: string) {
     try {
       const info = await transporter.sendMail({

@@ -1,7 +1,12 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    ForbiddenException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { PostDto } from './dto/create.post';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { NumericType, Repository } from 'typeorm';
 import { PostEntity } from './entities/post.entity';
 import { G4F } from 'g4f';
 import { promptsContent } from 'src/global/prompts';
@@ -14,15 +19,44 @@ export class PostsService {
         private postRepository: Repository<PostEntity>,
 
         @InjectRepository(UserEntity)
-        private userRepository: Repository<UserEntity>
+        private userRepository: Repository<UserEntity>,
     ) { }
 
     async getUsersWithPosts() {
-        const users = await this.userRepository.find({ 
-            relations: ['posts', 'comments'] 
+        const users = await this.userRepository.find({
+            relations: ['posts', 'comments'],
         });
 
         return users;
+    }
+
+    async validatePostAndUser(postId: number, userId: number) {
+        try {
+            const post = await this.postRepository.findOne({
+                where: {
+                    id: postId,
+                },
+
+                relations: ['user'],
+            });
+
+            if (post && post.user && post.user.id === userId) {
+                console.log(`el usuario que creo este post fue: ${post.user.id}`);
+
+                console.log(post);
+
+                return {
+                    userCreatedPost: post.user.id,
+                    details: post,
+                };
+            }
+
+            throw new ForbiddenException(`el usuario no tiene este post`);
+        } catch (error) {
+            console.log(error);
+
+            throw new BadRequestException(error);
+        }
     }
 
     async validateContentPost(contentPost: PostDto) {
@@ -46,7 +80,6 @@ export class PostsService {
             };
 
             return await g4f.chatCompletion(messages, options);
-
         } catch (error) {
             console.error(error);
         }
@@ -55,24 +88,30 @@ export class PostsService {
     async titleAlreadyExistsInDatabase(titlePost: string) {
         const searchTitleInDatabase = await this.postRepository.findOne({
             where: {
-                title: titlePost
-            }
-        })
+                title: titlePost,
+            },
 
-        if (searchTitleInDatabase) throw new BadRequestException('el titulo del post ya existe, intenta con uno nuevo')
+            relations: ['user']
+        });
+
+        if (searchTitleInDatabase)
+            throw new BadRequestException(
+                'el titulo del post ya existe, intenta con uno nuevo',
+            );
     }
 
     async postContent(userId: number, post: PostDto) {
         const searchPostExists = await this.postRepository.findOne({
             where: [
                 { title: post.title },
-                { description: post.description }
-            ]
-        })
+                { description: post.description }],
+        });
 
-        if (!searchPostExists) throw new BadRequestException('el post que   quieres modificar no existe')
+        if (!searchPostExists)
+            throw new BadRequestException(
+                'el post que   quieres modificar no existe',
+            );
 
-        // ! validar si el post si pertenece al usuario que intenta modificar
     }
 
     async createPost(userId: any, postData: PostDto) {
@@ -80,6 +119,7 @@ export class PostsService {
             await this.titleAlreadyExistsInDatabase(postData.title);
 
             const response = await this.validateContentPost(postData);
+
             if (response !== 'finded') {
                 throw new BadRequestException('Contenido inapropiado detectado');
             }
@@ -87,8 +127,8 @@ export class PostsService {
             // Obtener el usuario que creó el post
             const user = await this.userRepository.findOne({
                 where: {
-                    id: userId
-                }
+                    id: userId,
+                },
             });
 
             if (!user) throw new BadRequestException('Usuario no encontrado');
@@ -114,52 +154,35 @@ export class PostsService {
     async editPostUser(id: number, postData: PostDto) {
         try {
             // ! validar si el post lo creo el usuario o no, si el si lo creo entonces permitir editar, sino, no permitir alaburguer
-            await this.postContent(id, postData)
-            await this.titleAlreadyExistsInDatabase(postData.title)
+            await this.postContent(id, postData);
+            await this.titleAlreadyExistsInDatabase(postData.title);
 
             const newData = {
                 id: id,
                 title: postData.title,
-                description: postData.description
-            }
+                description: postData.description,
+            };
 
-            const instancePost = this.postRepository.create(newData)
-            const updatePost = await this.postRepository.save(instancePost)
+            const instancePost = this.postRepository.create(newData);
+            const updatePost = await this.postRepository.save(instancePost);
 
             return {
                 message: 'updated',
-                // postId: id,
                 postUpdated: instancePost,
-                details: updatePost
-            }
+                details: updatePost,
+            };
         } catch (error) {
-            throw new BadRequestException(error)
+            throw new BadRequestException(error);
         }
     }
 
-    async deletePostUser(postId: any) {
+    async deletePostUser(userId: number, postId: number) {
         try {
-            // ! validar si el post lo creo el usuario o no, si el si lo creo entonces permitir eliminar, sino, no permitir alaburguer
+            const data = await this.validatePostAndUser(postId, userId);
 
-            const searchPostId = await this.postRepository.findOne({
-                where: {
-                    id: postId
-                }
-            })
-
-            console.log(searchPostId);
-
-            if (!searchPostId || searchPostId == null) throw new ForbiddenException('NO EXISTE EL POST')
-
-            if (searchPostId) {
-                await this.postRepository.delete(postId)
-                return {
-                    message: 'post deleted',
-                    details: searchPostId
-                }
-            }
+            return data;
         } catch (error) {
-            throw new BadRequestException(error)
+            throw new BadRequestException(error);
         }
     }
 }

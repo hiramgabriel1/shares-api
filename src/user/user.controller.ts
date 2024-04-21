@@ -40,4 +40,9 @@ export class UserController {
   findUser(@Param('id') id: number) {
     return this.userService.getUserInfo(id)
   }
+
+  @Get('users')
+  users(){
+    return this.userService.renderUsers()
+  }
 }
