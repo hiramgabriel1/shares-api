@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from 
 import { PostsService } from './posts.service';
 import { PostDto } from './dto/create.post';
 import { AuthGuard } from 'src/guard/jwt.guard';
-import { UpdatePostDto } from './dto/update.post';
 
 @Controller('posts')
 export class PostsController {
