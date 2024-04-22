@@ -200,7 +200,6 @@ export class PostsService {
             await this.postRepository.delete(postId)
 
             return 'post deleted successfully'
-            
         } catch (error) {
             throw new BadRequestException(error);
         }
