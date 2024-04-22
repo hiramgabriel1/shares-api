@@ -19,12 +19,12 @@ export class UserService {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async validateIfUserExists(userId: number) {
     const userIsAlreadyExistsInDatabase = await this.userRepository.findOne({
       where: {
-        id: userId
+        id: userId,
       },
     });
 
@@ -35,25 +35,26 @@ export class UserService {
   async renderUsersWithPosts() {
     const findPosts = await this.userRepository.find({
       relations: ['posts', 'comments'],
-    })
+    });
 
     console.log(findPosts);
 
-    let p = findPosts.filter((post) => post.posts.length >= 1)
+    let p = findPosts.filter((post) => post.posts.length >= 1);
 
-    return p
+    return p;
   }
 
   async renderUsers() {
-    const findPosts = await this.userRepository.find({
-      relations: ['posts', 'comments'],
-    })
+    return await this.userRepository.find();
+    // const findPosts = await this.userRepository.find({
+    //   relations: ['posts', 'comments'],
+    // })
 
-    // console.log(findPosts);
+    // // console.log(findPosts);
 
-    // let p = findPosts.filter((post) => post.posts.length >= 1)
+    // // let p = findPosts.filter((post) => post.posts.length >= 1)
 
-    return findPosts
+    // return findPosts
   }
 
   async sendEmailConfirmUser(email: string) {
@@ -72,11 +73,18 @@ export class UserService {
     }
   }
 
-  async createNewUser(userData: any) {
+  async createNewUser(userData: UserDto) {
     try {
       const { email } = userData;
-      await this.validateIfUserExists(userData);
       await this.sendEmailConfirmUser(email);
+
+      const validateIfUserAlreadyExistsInDatabase =
+        await this.userRepository.findOne({
+          where: [{ username: userData.username }, { email: userData.email }],
+        });
+
+      if (validateIfUserAlreadyExistsInDatabase)
+        throw new BadRequestException('el usuario ya existe alaburguer');
 
       const encryptPassword = await bcrypt.hash(userData.password, 10);
       const instanceUserInDatabase = this.userRepository.create({
@@ -91,7 +99,7 @@ export class UserService {
         return {
           message: 'user created',
           details: userCreated,
-          ID: this.userRepository.getId,
+          id: this.userRepository.getId,
         };
       }
     } catch (error) {
@@ -120,6 +128,7 @@ export class UserService {
       }
 
       const payload = {
+        userId: userFindToLogin.id,
         name: userFindToLogin.username,
         email: userFindToLogin.email,
         roleUser: userFindToLogin.role,
@@ -145,10 +154,13 @@ export class UserService {
         preferences: updateUser.preferences,
         description: updateUser.description,
         tecnologies: updateUser.tecnologies,
-        role: updateUser.role
-      }
+        role: updateUser.role,
+      };
 
-      const instanceUserToUpdate = await this.userRepository.update(userId, newDataUser);
+      const instanceUserToUpdate = await this.userRepository.update(
+        userId,
+        newDataUser,
+      );
 
       if (!instanceUserToUpdate)
         throw new BadRequestException(`error al actualizar ${userId}`);
@@ -173,11 +185,10 @@ export class UserService {
     const findPosts = await this.userRepository.findOne({
       relations: ['posts', 'comments'],
       where: {
-        id: userId
-      }
-    })
+        id: userId,
+      },
+    });
 
-    return findPosts
-
+    return findPosts;
   }
 }
