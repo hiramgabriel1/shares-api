@@ -27,6 +27,7 @@ import { AdminController } from './admin/admin.controller';
 import { GroupsService } from './groups/groups.service';
 import configuration from './config/configuration';
 import { EventEntity } from './events/entities/event.entity';
+import { ReportEntity } from './reports/entities/report.entity';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { EventEntity } from './events/entities/event.entity';
       PostEntity,
       CommentEntity,
       EventEntity,
+      ReportEntity
     ]),
 
     UserModule,
