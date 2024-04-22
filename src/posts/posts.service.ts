@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PostDto } from './dto/create.post';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NumericType, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { PostEntity } from './entities/post.entity';
 import { G4F } from 'g4f';
 import { promptsContent } from 'src/global/prompts';
