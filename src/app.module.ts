@@ -26,6 +26,7 @@ import { AdminService } from './admin/admin.service';
 import { AdminController } from './admin/admin.controller';
 import { GroupsService } from './groups/groups.service';
 import configuration from './config/configuration';
+import { EventEntity } from './events/entities/event.entity';
 
 @Module({
   imports: [
@@ -45,7 +46,13 @@ import configuration from './config/configuration';
       entities: [UserEntity, PostEntity, CommentEntity],
       synchronize: true, // ? sincroniza los cambios de las entities
     }),
-    TypeOrmModule.forFeature([UserEntity, PostEntity, CommentEntity]),
+    
+    TypeOrmModule.forFeature([
+      UserEntity,
+      PostEntity,
+      CommentEntity,
+      EventEntity,
+    ]),
 
     UserModule,
     PostsModule,
@@ -63,9 +70,9 @@ import configuration from './config/configuration';
     GroupsController,
     ReportsController,
     EventsController,
-    AdminController
+    AdminController,
   ],
-  
+
   providers: [
     UserService,
     CommentsService,
