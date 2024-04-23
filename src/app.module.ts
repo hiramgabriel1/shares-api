@@ -28,6 +28,8 @@ import { GroupsService } from './groups/groups.service';
 import configuration from './config/configuration';
 import { EventEntity } from './events/entities/event.entity';
 import { ReportEntity } from './reports/entities/report.entity';
+import { NotificationsModule } from './notifications/notifications.module';
+import { AssistantModule } from './assistant/assistant.module';
 
 @Module({
   imports: [
@@ -63,6 +65,8 @@ import { ReportEntity } from './reports/entities/report.entity';
     AdminModule,
     CommentsModule,
     ReportsModule,
+    NotificationsModule,
+    AssistantModule,
   ],
 
   controllers: [
