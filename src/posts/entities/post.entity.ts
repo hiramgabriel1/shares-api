@@ -17,7 +17,7 @@ export class PostEntity {
   title: string;
 
   @Column('text')
-  description: string;
+  description?: string;
 
   @ManyToOne(() => UserEntity, (user) => user.posts)
   user: UserEntity;
