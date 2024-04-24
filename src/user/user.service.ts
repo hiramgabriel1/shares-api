@@ -22,7 +22,7 @@ export class UserService {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async searchUser(userId: number) {
     const userIsAlreadyExistsInDatabase = await this.userRepository.findOne({
@@ -58,6 +58,7 @@ export class UserService {
     return p;
   }
 
+  //#region render users
   async renderUsers() {
     const findPosts = await this.userRepository.find({
       relations: ['posts', 'comments', 'events', 'groups'],

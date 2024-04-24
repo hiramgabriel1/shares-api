@@ -1,4 +1,5 @@
 import { CommentEntity } from 'src/comments/entities/comments.entity';
+import { GroupEntity } from 'src/groups/entities/group.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -21,6 +22,9 @@ export class PostEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.posts)
   user: UserEntity;
+
+  @ManyToOne(() => GroupEntity, (groups) => groups.posts)
+  groups: GroupEntity[];
 
   @OneToMany(() => CommentEntity, (comment) => comment.post)
   comments: CommentEntity[];
