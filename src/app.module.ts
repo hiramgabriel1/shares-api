@@ -30,6 +30,8 @@ import { ReportEntity } from './reports/entities/report.entity';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AssistantModule } from './assistant/assistant.module';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
+import { BookmarkEntity } from './bookmarks/entities/bookmark.entity';
+import { FollowingModule } from './following/following.module';
 
 @Module({
   imports: [
@@ -55,7 +57,8 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
       PostEntity,
       CommentEntity,
       EventEntity,
-      ReportEntity
+      ReportEntity,
+      BookmarkEntity
     ]),
 
     UserModule,
@@ -68,6 +71,7 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
     NotificationsModule,
     AssistantModule,
     BookmarksModule,
+    FollowingModule,
   ],
 
   controllers: [

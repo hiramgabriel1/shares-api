@@ -9,6 +9,7 @@ import { PostEntity } from 'src/posts/entities/post.entity';
 import { CommentEntity } from 'src/comments/entities/comments.entity';
 import { EventEntity } from 'src/events/entities/event.entity';
 import { GroupEntity } from 'src/groups/entities/group.entity';
+import { BookmarkEntity } from 'src/bookmarks/entities/bookmark.entity';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { GroupEntity } from 'src/groups/entities/group.entity';
       CommentEntity,
       EventEntity,
       GroupEntity,
+      BookmarkEntity,
     ]),
     JwtModule.register({
       global: true,

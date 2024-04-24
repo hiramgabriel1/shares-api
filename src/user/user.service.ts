@@ -61,7 +61,14 @@ export class UserService {
   //#region render users
   async renderUsers() {
     const findPosts = await this.userRepository.find({
-      relations: ['posts', 'comments', 'events', 'groups'],
+      relations: [
+        'posts',
+        'comments',
+        'events',
+        'groups',
+        'bookmarks',
+        'following',
+      ],
     });
 
     console.log(findPosts);
