@@ -10,5 +10,4 @@ export class CreateEventDto {
 
   @IsString()
   readonly description: string;
-
 }

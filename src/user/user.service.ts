@@ -1,6 +1,8 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserDto } from './dto/createUser.dto';
@@ -11,6 +13,7 @@ import { LoginDto } from './dto/loginUser.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { transporter } from './email.validator';
+import { CreateEventDto } from './dto/createEvent.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -19,7 +22,18 @@ export class UserService {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
     private jwtService: JwtService,
-  ) {}
+  ) { }
+
+  async searchUser(userId: number) {
+    const userIsAlreadyExistsInDatabase = await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!userIsAlreadyExistsInDatabase)
+      throw new ForbiddenException('el usuario no existe');
+  }
 
   async validateIfUserExists(userId: number) {
     const userIsAlreadyExistsInDatabase = await this.userRepository.findOne({
@@ -29,7 +43,7 @@ export class UserService {
     });
 
     if (userIsAlreadyExistsInDatabase)
-      throw new BadRequestException('El usuario ya existe');
+      throw new ForbiddenException('El usuario ya existe');
   }
 
   async renderUsersWithPosts() {
@@ -45,16 +59,15 @@ export class UserService {
   }
 
   async renderUsers() {
-    return await this.userRepository.find();
-    // const findPosts = await this.userRepository.find({
-    //   relations: ['posts', 'comments'],
-    // })
+    const findPosts = await this.userRepository.find({
+      relations: ['posts', 'comments', 'events', 'groups'],
+    });
 
-    // // console.log(findPosts);
+    console.log(findPosts);
 
-    // // let p = findPosts.filter((post) => post.posts.length >= 1)
+    // let p = findPosts.filter((post) => post.posts.length >= 1)
 
-    // return findPosts
+    return findPosts;
   }
 
   async sendEmailConfirmUser(email: string) {
@@ -190,5 +203,35 @@ export class UserService {
     });
 
     return findPosts;
+  }
+
+  async createEvent(userId: number, eventBody: CreateEventDto) {
+    try {
+      await this.searchUser(userId);
+
+      const getUser = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+      const instanceNewEvent = {
+        user: getUser,
+        ...eventBody,
+      };
+      const newEventUser = this.userRepository.create(instanceNewEvent);
+
+      if (!newEventUser) throw new BadRequestException('error en los datos');
+
+      if (newEventUser) {
+        return {
+          message: 'event created',
+          details: instanceNewEvent,
+          data: newEventUser,
+        };
+      }
+
+      throw new InternalServerErrorException('error interno');
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }

@@ -16,7 +16,7 @@ export class EventsService {
 
     ) { }
 
-    async createEventUser(userId: number, eventData: CreateEventDto) {
+    async createEventUser(eventData: CreateEventDto) {
         try {
             
         } catch (error) {

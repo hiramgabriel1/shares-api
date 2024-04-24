@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class EventEntity {
@@ -11,6 +12,7 @@ export class EventEntity {
   @Column('text')
   description: string;
 
-  @Column('int')
-  members: number;
+  // unimos la tabla de usuario con la de eventos
+  @ManyToOne(() => UserEntity, user => user.events)
+  user: UserEntity
 }

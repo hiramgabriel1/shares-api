@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { EventsService } from './events.service';
-import { EventsController } from './events.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventEntity } from './entities/event.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
@@ -24,7 +23,7 @@ import { constants } from 'src/constants/constants';
       signOptions: { expiresIn: '24h' },
     }),
   ],
-  controllers: [EventsController],
+  controllers: [],
   providers: [EventsService],
 })
 export class EventsModule {}

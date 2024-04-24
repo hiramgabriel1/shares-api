@@ -19,7 +19,6 @@ import { CommentsService } from './comments/comments.service';
 import { PostsService } from './posts/posts.service';
 import { GroupsController } from './groups/groups.controller';
 import { ReportsController } from './reports/reports.controller';
-import { EventsController } from './events/events.controller';
 import { EventsService } from './events/events.service';
 import { ReportsService } from './reports/reports.service';
 import { AdminService } from './admin/admin.service';
@@ -30,6 +29,7 @@ import { EventEntity } from './events/entities/event.entity';
 import { ReportEntity } from './reports/entities/report.entity';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AssistantModule } from './assistant/assistant.module';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
 
 @Module({
   imports: [
@@ -67,6 +67,7 @@ import { AssistantModule } from './assistant/assistant.module';
     ReportsModule,
     NotificationsModule,
     AssistantModule,
+    BookmarksModule,
   ],
 
   controllers: [
@@ -75,7 +76,6 @@ import { AssistantModule } from './assistant/assistant.module';
     PostsController,
     GroupsController,
     ReportsController,
-    EventsController,
     AdminController,
   ],
 
