@@ -14,6 +14,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { transporter } from './email.validator';
 import { CreateEventDto } from './dto/createEvent.dto';
+import { EventEntity } from 'src/events/entities/event.entity';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -21,8 +22,12 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+
+    @InjectRepository(EventEntity)
+    private eventRepository: Repository<EventEntity>,
+
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async searchUser(userId: number) {
     const userIsAlreadyExistsInDatabase = await this.userRepository.findOne({
@@ -62,9 +67,9 @@ export class UserService {
   async renderUsers() {
     const findPosts = await this.userRepository.find({
       relations: [
+        'events',
         'posts',
         'comments',
-        'events',
         'groups',
         'bookmarks',
         'following',
@@ -72,8 +77,6 @@ export class UserService {
     });
 
     console.log(findPosts);
-
-    // let p = findPosts.filter((post) => post.posts.length >= 1)
 
     return findPosts;
   }
@@ -163,6 +166,7 @@ export class UserService {
     }
   }
 
+  //#region pendiente alabruger
   // ! pendiente
   async updateUser(userId: number, updateUser: UpdateUserDto) {
     try {
@@ -213,7 +217,7 @@ export class UserService {
     return findPosts;
   }
 
-  async createEvent(userId: number, eventBody: CreateEventDto) {
+  async createEvent(userId: number, eventBody: any) {
     try {
       await this.searchUser(userId);
 
@@ -221,22 +225,22 @@ export class UserService {
         where: { id: userId },
       });
       const instanceNewEvent = {
-        user: getUser,
+        userCreatorToEvent: getUser,
         ...eventBody,
       };
-      const newEventUser = this.userRepository.create(instanceNewEvent);
+      const newEventUser = this.eventRepository.create(instanceNewEvent);
 
       if (!newEventUser) throw new BadRequestException('error en los datos');
 
-      if (newEventUser) {
-        return {
-          message: 'event created',
-          details: instanceNewEvent,
-          data: newEventUser,
-        };
-      }
+      await this.eventRepository.save(newEventUser);
 
-      throw new InternalServerErrorException('error interno');
+      return {
+        message: 'event created',
+        details: instanceNewEvent,
+        data: newEventUser,
+      };
+
+      // throw new InternalServerErrorException('error interno');
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error.message);

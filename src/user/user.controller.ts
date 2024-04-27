@@ -13,10 +13,20 @@ import { UserDto } from './dto/createUser.dto';
 import { LoginDto } from './dto/loginUser.dto';
 import { AuthGuard } from 'src/guard/jwt.guard';
 import { CreateEventDto } from './dto/createEvent.dto';
+import { EventsService } from 'src/events/events.service';
 
 @Controller()
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly eventService: EventsService
+  
+  ) {}
+
+  @Get('events')
+  events(){
+    return this.eventService.getEvents()
+  }
 
   @Get('info')
   @UseGuards(AuthGuard)
@@ -54,13 +64,13 @@ export class UserController {
     return this.userService.userLogin(userLogin);
   }
 
-  @Post('')
+  @Post('users/create-event/:userId')
   @UseGuards(AuthGuard)
   userCreateEvent(
     @Param('userId') userId: number,
-    @Body() eventBody: CreateEventDto
+    @Body() eventBody: any
   ) {
-    return this.userService.createEvent(userId, eventBody);
+    return this.eventService.createEventUser(userId, eventBody);
   }
 
   @Put('user/:id')

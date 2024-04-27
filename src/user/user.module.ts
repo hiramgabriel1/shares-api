@@ -10,6 +10,7 @@ import { CommentEntity } from 'src/comments/entities/comments.entity';
 import { EventEntity } from 'src/events/entities/event.entity';
 import { GroupEntity } from 'src/groups/entities/group.entity';
 import { BookmarkEntity } from 'src/bookmarks/entities/bookmark.entity';
+import { EventsService } from 'src/events/events.service';
 
 @Module({
   imports: [
@@ -28,6 +29,6 @@ import { BookmarkEntity } from 'src/bookmarks/entities/bookmark.entity';
     }),
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, EventsService],
 })
 export class UserModule {}
