@@ -8,7 +8,6 @@ import {
   Param,
   Put,
   UseInterceptors,
-  Inject,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/createUser.dto';
@@ -16,25 +15,15 @@ import { LoginDto } from './dto/loginUser.dto';
 import { AuthGuard } from 'src/guard/jwt.guard';
 import { CreateEventDto } from './dto/createEvent.dto';
 import { EventsService } from 'src/events/events.service';
-import {
-  CACHE_MANAGER,
-  Cache,
-  CacheInterceptor,
-  CacheKey,
-  CacheTTL,
-} from '@nestjs/cache-manager';
 
 @Controller()
 export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly eventService: EventsService,
-
-    // @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) { }
 
   @Get('events')
-  // @UseInterceptors(CacheInterceptor)
   events() {
     return this.eventService.getEvents();
   }
@@ -52,9 +41,7 @@ export class UserController {
   }
 
   @Get('user/:id')
-  // @UseInterceptors(CacheInterceptor)
-  // @CacheKey('custom_key')
-  // @CacheTTL(20)
+  @UseGuards(AuthGuard)
   findUser(@Param('id') id: number) {
     return this.userService.getUserInfo(id);
   }

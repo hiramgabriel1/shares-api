@@ -121,6 +121,7 @@ import configuration from './config/configuration';
       useClass: ThrottlerGuard,
     },
   ],
+  
 })
 
 export class AppModule {}

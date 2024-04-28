@@ -258,7 +258,6 @@ export class UserService {
         data: newEventUser,
       };
 
-      // throw new InternalServerErrorException('error interno');
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error.message);
