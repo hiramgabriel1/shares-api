@@ -24,7 +24,6 @@ import { ReportsService } from './reports/reports.service';
 import { AdminService } from './admin/admin.service';
 import { AdminController } from './admin/admin.controller';
 import { GroupsService } from './groups/groups.service';
-import configuration from './config/configuration';
 import { EventEntity } from './events/entities/event.entity';
 import { ReportEntity } from './reports/entities/report.entity';
 import { NotificationsModule } from './notifications/notifications.module';
@@ -34,10 +33,23 @@ import { BookmarkEntity } from './bookmarks/entities/bookmark.entity';
 import { FollowingModule } from './following/following.module';
 import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import configuration from './config/configuration';
+import { redisStore } from 'cache-manager-redis-yet';
 
 @Module({
   imports: [
-    CacheModule.register({ isGlobal: true }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: async () => ({
+        store: await redisStore({
+          socket: {
+            host: 'localhost',
+            port: 6379
+          }
+        })
+      })
+    }),
+    
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
@@ -94,10 +106,6 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     ReportsService,
     AdminService,
     GroupsService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CacheInterceptor,
-    },
   ],
 })
 export class AppModule {}

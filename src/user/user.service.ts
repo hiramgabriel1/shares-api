@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -16,10 +17,14 @@ import { transporter } from './email.validator';
 import { CreateEventDto } from './dto/createEvent.dto';
 import { EventEntity } from 'src/events/entities/event.entity';
 import * as bcrypt from 'bcrypt';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class UserService {
   constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
 
@@ -27,7 +32,7 @@ export class UserService {
     private eventRepository: Repository<EventEntity>,
 
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async searchUser(userId: number) {
     const userIsAlreadyExistsInDatabase = await this.userRepository.findOne({
@@ -65,6 +70,11 @@ export class UserService {
 
   //#region render users
   async renderUsers() {
+    const usersCacheKey = 'users';
+    const cachedUsers = await this.cacheManager.get(usersCacheKey);
+
+    if (cachedUsers) return cachedUsers;
+
     const findPosts = await this.userRepository.find({
       relations: [
         'events',
@@ -76,7 +86,7 @@ export class UserService {
       ],
     });
 
-    console.log(findPosts);
+    await this.cacheManager.set(usersCacheKey, findPosts, 1000 * 10);
 
     return findPosts;
   }
@@ -214,7 +224,7 @@ export class UserService {
       },
     });
 
-    return findPosts
+    return findPosts;
   }
 
   async createEvent(userId: number, eventBody: any) {

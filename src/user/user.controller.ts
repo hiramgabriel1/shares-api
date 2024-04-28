@@ -8,6 +8,7 @@ import {
   Param,
   Put,
   UseInterceptors,
+  Inject,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/createUser.dto';
@@ -15,24 +16,32 @@ import { LoginDto } from './dto/loginUser.dto';
 import { AuthGuard } from 'src/guard/jwt.guard';
 import { CreateEventDto } from './dto/createEvent.dto';
 import { EventsService } from 'src/events/events.service';
-import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
+import {
+  CACHE_MANAGER,
+  Cache,
+  CacheInterceptor,
+  CacheKey,
+  CacheTTL,
+} from '@nestjs/cache-manager';
 
 @Controller()
 export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly eventService: EventsService,
+
+    // @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) { }
 
   @Get('events')
-  @UseInterceptors(CacheInterceptor)
+  // @UseInterceptors(CacheInterceptor)
   events() {
     return this.eventService.getEvents();
   }
 
   @Get('info')
   @UseGuards(AuthGuard)
-  @UseInterceptors(CacheInterceptor)
+  // @UseInterceptors(CacheInterceptor)
   profile(
     @Request()
     req,
@@ -43,25 +52,21 @@ export class UserController {
   }
 
   @Get('user/:id')
-  @UseInterceptors(CacheInterceptor)
+  // @UseInterceptors(CacheInterceptor)
   // @CacheKey('custom_key')
   // @CacheTTL(20)
   findUser(@Param('id') id: number) {
     return this.userService.getUserInfo(id);
   }
 
+  // @UseInterceptors(CacheInterceptor)
   @Get('users')
-  @UseInterceptors(CacheInterceptor)
-  // @CacheKey('custom_key')
-  // @CacheTTL(20)
   users() {
     return this.userService.renderUsers();
   }
 
   @Get('users/posts')
-  @UseInterceptors(CacheInterceptor)
-  // @CacheKey('custom_key')
-  // @CacheTTL(20)
+  // @UseInterceptors(CacheInterceptor)
   usersWithPost() {
     return this.userService.renderUsersWithPosts();
   }
