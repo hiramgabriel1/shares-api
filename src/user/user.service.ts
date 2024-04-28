@@ -103,8 +103,8 @@ export class UserService {
       const info = await transporter.sendMail({
         from: `"Devs Shares 👻" <${process.env.EMAIL_PROVIDER}>`,
         to: `${email}`,
-        subject: 'Hello ✔',
-        text: 'Hello world?',
+        subject: 'Hello maura G✔',
+        text: 'Hello world maura Gxdd',
         html: '<b>Hello world?</b>',
       });
 
