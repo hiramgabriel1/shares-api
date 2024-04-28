@@ -32,9 +32,12 @@ import { AssistantModule } from './assistant/assistant.module';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { BookmarkEntity } from './bookmarks/entities/bookmark.entity';
 import { FollowingModule } from './following/following.module';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
+    CacheModule.register({ isGlobal: true }),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
@@ -51,14 +54,14 @@ import { FollowingModule } from './following/following.module';
       entities: [UserEntity, PostEntity, CommentEntity],
       synchronize: true, // ? sincroniza los cambios de las entities
     }),
-    
+
     TypeOrmModule.forFeature([
       UserEntity,
       PostEntity,
       CommentEntity,
       EventEntity,
       ReportEntity,
-      BookmarkEntity
+      BookmarkEntity,
     ]),
 
     UserModule,
@@ -91,6 +94,10 @@ import { FollowingModule } from './following/following.module';
     ReportsService,
     AdminService,
     GroupsService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
   ],
 })
 export class AppModule {}

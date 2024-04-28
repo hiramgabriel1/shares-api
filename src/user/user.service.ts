@@ -214,7 +214,7 @@ export class UserService {
       },
     });
 
-    return findPosts;
+    return findPosts
   }
 
   async createEvent(userId: number, eventBody: any) {
