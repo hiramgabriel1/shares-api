@@ -32,7 +32,13 @@ export class UserService {
     private eventRepository: Repository<EventEntity>,
 
     private jwtService: JwtService,
-  ) {}
+  ) { }
+
+  async checkCacheStored(cacheKey: string): Promise<boolean> {
+    const isCached = await this.cacheManager.get(cacheKey);
+
+    return !!isCached;
+  }
 
   async searchUser(userId: number) {
     const userIsAlreadyExistsInDatabase = await this.userRepository.findOne({
@@ -70,10 +76,14 @@ export class UserService {
 
   //#region render users
   async renderUsers() {
-    const usersCacheKey = 'users';
-    const cachedUsers = await this.cacheManager.get(usersCacheKey);
+    const cacheKey = 'users'
+    const cached = await this.checkCacheStored(cacheKey);
 
-    if (cachedUsers) return cachedUsers;
+    if (cached) {
+      const dataCached = await this.cacheManager.get(cacheKey)
+
+      return dataCached
+    };
 
     const findPosts = await this.userRepository.find({
       relations: [
@@ -86,7 +96,7 @@ export class UserService {
       ],
     });
 
-    await this.cacheManager.set(usersCacheKey, findPosts, 1000 * 10);
+    await this.cacheManager.set(cacheKey, findPosts, 1000 * 10);
 
     return findPosts;
   }
