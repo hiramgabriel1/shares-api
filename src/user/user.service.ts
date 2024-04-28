@@ -14,11 +14,11 @@ import { LoginDto } from './dto/loginUser.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { transporter } from './email.validator';
-import { CreateEventDto } from './dto/createEvent.dto';
 import { EventEntity } from 'src/events/entities/event.entity';
-import * as bcrypt from 'bcrypt';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from '@nestjs/cache-manager';
+import * as bcrypt from 'bcrypt';
+import { CacheChecked } from 'src/common/checked.cache';
 
 @Injectable()
 export class UserService {
@@ -32,13 +32,15 @@ export class UserService {
     private eventRepository: Repository<EventEntity>,
 
     private jwtService: JwtService,
-  ) { }
 
-  async checkCacheStored(cacheKey: string): Promise<boolean> {
-    const isCached = await this.cacheManager.get(cacheKey);
+    private cacheService: CacheChecked,
+  ) {}
 
-    return !!isCached;
-  }
+  // async checkCacheStored(cacheKey: string): Promise<boolean> {
+  //   const isCached = await this.cacheManager.get(cacheKey);
+
+  //   return !!isCached;
+  // }
 
   async searchUser(userId: number) {
     const userIsAlreadyExistsInDatabase = await this.userRepository.findOne({
@@ -76,14 +78,15 @@ export class UserService {
 
   //#region render users
   async renderUsers() {
-    const cacheKey = 'users'
-    const cached = await this.checkCacheStored(cacheKey);
+    const cacheKey = 'users';
+    // const cached = await this.checkCacheStored(cacheKey);
+    const cached = await this.cacheService.checkCacheStored(cacheKey);
 
     if (cached) {
-      const dataCached = await this.cacheManager.get(cacheKey)
+      const dataCached = await this.cacheManager.get(cacheKey);
 
-      return dataCached
-    };
+      return dataCached;
+    }
 
     const findPosts = await this.userRepository.find({
       relations: [

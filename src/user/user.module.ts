@@ -11,6 +11,7 @@ import { EventEntity } from 'src/events/entities/event.entity';
 import { GroupEntity } from 'src/groups/entities/group.entity';
 import { BookmarkEntity } from 'src/bookmarks/entities/bookmark.entity';
 import { EventsService } from 'src/events/events.service';
+import { CacheChecked } from 'src/common/checked.cache';
 
 @Module({
   imports: [
@@ -29,6 +30,6 @@ import { EventsService } from 'src/events/events.service';
     }),
   ],
   controllers: [UserController],
-  providers: [UserService, EventsService],
+  providers: [UserService, EventsService, CacheChecked],
 })
 export class UserModule {}

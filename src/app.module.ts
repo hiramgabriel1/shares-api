@@ -31,10 +31,10 @@ import { AssistantModule } from './assistant/assistant.module';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { BookmarkEntity } from './bookmarks/entities/bookmark.entity';
 import { FollowingModule } from './following/following.module';
-import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { CacheModule } from '@nestjs/cache-manager';
 import configuration from './config/configuration';
 import { redisStore } from 'cache-manager-redis-yet';
+import { CacheChecked } from './common/checked.cache';
 
 @Module({
   imports: [
@@ -44,12 +44,12 @@ import { redisStore } from 'cache-manager-redis-yet';
         store: await redisStore({
           socket: {
             host: 'localhost',
-            port: 6379
-          }
-        })
-      })
+            port: 6379,
+          },
+        }),
+      }),
     }),
-    
+
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
@@ -106,6 +106,7 @@ import { redisStore } from 'cache-manager-redis-yet';
     ReportsService,
     AdminService,
     GroupsService,
+    CacheChecked,
   ],
 })
 export class AppModule {}
