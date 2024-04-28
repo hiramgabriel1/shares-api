@@ -36,12 +36,6 @@ export class UserService {
     private cacheService: CacheChecked,
   ) {}
 
-  // async checkCacheStored(cacheKey: string): Promise<boolean> {
-  //   const isCached = await this.cacheManager.get(cacheKey);
-
-  //   return !!isCached;
-  // }
-
   async searchUser(userId: number) {
     const userIsAlreadyExistsInDatabase = await this.userRepository.findOne({
       where: {
@@ -107,7 +101,7 @@ export class UserService {
   async sendEmailConfirmUser(email: string) {
     try {
       const info = await transporter.sendMail({
-        from: `"Maddison Foo Koch 👻" <${process.env.EMAIL_PROVIDER}>`,
+        from: `"Devs Shares 👻" <${process.env.EMAIL_PROVIDER}>`,
         to: `${email}`,
         subject: 'Hello ✔',
         text: 'Hello world?',
@@ -123,7 +117,6 @@ export class UserService {
   async createNewUser(userData: UserDto) {
     try {
       const { email } = userData;
-      await this.sendEmailConfirmUser(email);
 
       const validateIfUserAlreadyExistsInDatabase =
         await this.userRepository.findOne({
@@ -143,6 +136,9 @@ export class UserService {
       );
 
       if (instanceUserInDatabase) {
+        // send email!
+        await this.sendEmailConfirmUser(email);
+
         return {
           message: 'user created',
           details: userCreated,
