@@ -136,7 +136,6 @@ export class UserService {
       );
 
       if (instanceUserInDatabase) {
-        // send email!
         await this.sendEmailConfirmUser(email);
 
         return {

@@ -32,12 +32,21 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { BookmarkEntity } from './bookmarks/entities/bookmark.entity';
 import { FollowingModule } from './following/following.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import configuration from './config/configuration';
 import { redisStore } from 'cache-manager-redis-yet';
 import { CacheChecked } from './common/checked.cache';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import configuration from './config/configuration';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 3,
+      },
+    ]),
+
     CacheModule.registerAsync({
       isGlobal: true,
       useFactory: async () => ({
@@ -107,6 +116,11 @@ import { CacheChecked } from './common/checked.cache';
     AdminService,
     GroupsService,
     CacheChecked,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
+
 export class AppModule {}
