@@ -43,7 +43,7 @@ import configuration from './config/configuration';
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
-        limit: 3,
+        limit: 10,
       },
     ]),
 
