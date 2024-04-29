@@ -7,6 +7,7 @@ import { UserEntity } from 'src/user/entities/user.entity';
 import { PostEntity } from 'src/posts/entities/post.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { constants } from 'src/constants/constants';
+import { CacheChecked } from 'src/common/checked.cache';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import { constants } from 'src/constants/constants';
     }),
   ],
   controllers: [BookmarksController],
-  providers: [BookmarksService],
+  providers: [BookmarksService, CacheChecked],
 })
 export class BookmarksModule { }

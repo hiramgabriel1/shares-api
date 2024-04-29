@@ -23,7 +23,8 @@ import { CacheChecked } from 'src/common/checked.cache';
 @Injectable()
 export class UserService {
   constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(CACHE_MANAGER) 
+    private cacheManager: Cache,
 
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
@@ -103,8 +104,8 @@ export class UserService {
       const info = await transporter.sendMail({
         from: `"Devs Shares 👻" <${process.env.EMAIL_PROVIDER}>`,
         to: `${email}`,
-        subject: 'Hello maura G✔',
-        text: 'Hello world maura Gxdd',
+        subject: 'Hello  G✔',
+        text: 'Hello world  Gxdd',
         html: '<b>Hello world?</b>',
       });
 

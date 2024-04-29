@@ -37,6 +37,8 @@ import { CacheChecked } from './common/checked.cache';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import configuration from './config/configuration';
+import { BookmarksController } from './bookmarks/bookmarks.controller';
+import { BookmarksService } from './bookmarks/bookmarks.service';
 
 @Module({
   imports: [
@@ -105,6 +107,7 @@ import configuration from './config/configuration';
     GroupsController,
     ReportsController,
     AdminController,
+    BookmarksController,
   ],
 
   providers: [
@@ -116,12 +119,11 @@ import configuration from './config/configuration';
     AdminService,
     GroupsService,
     CacheChecked,
+    BookmarksService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
   ],
-  
 })
-
-export class AppModule {}
+export class AppModule { }
