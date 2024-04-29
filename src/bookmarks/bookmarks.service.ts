@@ -110,4 +110,11 @@ export class BookmarksService {
         }
     }
 
+    async getBookmarks(userID: number) {
+        // obtener los bookmark por el id del usuario
+    }
+
+    async editBookmark(bookmarkID: number, userID: number, bodyBookmark: any) {
+        // modificar los bookmark por id del usuario
+    }
 }
