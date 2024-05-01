@@ -55,52 +55,40 @@ export class BookmarksService {
     // ! validar si el usuario ya tiene guardado el bookmark para que no se repita
     async saveBookmark(postID: number, userID: number) {
         try {
+            // Validar si el post y el usuario existen
             const bookmarkSearch = await this.validateIfPostExists(postID);
             const userSearch = await this.validateIfUserExists(userID);
-            const { id } = bookmarkSearch;
+
+            // Buscar el usuario y sus marcadores asociados
             const verifyBookmark = await this.userRepository.findOne({
                 where: { id: userID },
                 relations: ['bookmarks'],
             });
 
-            console.log(verifyBookmark.bookmarks);
-            const uniqueBookmarks = Array.from(
-                new Set(
-                    verifyBookmark.bookmarks.map((bookmark) => bookmark.idBookmarks),
-                ),
-            ).map((id) =>
-                verifyBookmark.bookmarks.find(
-                    (bookmark) => bookmark.idBookmarks === id,
-                ),
+            // Verificar si el marcador ya existe para este usuario
+            const bookmarkExists = verifyBookmark.bookmarks.some(
+                (bookmark) => bookmark.idBookmarks === postID,
             );
-            console.log(uniqueBookmarks);
-            
-            // if(verifyBookmark.bookmarks)
-            // console.log('user search: ', userSearch);
-            // console.log('bookmark: ', verifyBookmark.user.bookmarks);
 
-            // // if(verifyBookmark.idBookmarks)
+            if (bookmarkExists) {
+                throw new Error(
+                    'Este post ya está guardado en los bookmarks del usuario',
+                );
+            }
 
-            // if (verifyBookmark && verifyBookmark.idBookmarks === postID) {
-            //     return {
-            //         message: 'este post ya esta guardado en los bookmarks del usuario',
-            //     };
-            // }
+            const saveBookmark = this.bookmarkRepository.create({
+                user: userSearch,
+                idBookmarks: postID,
+            });
 
-            // const saveBookmark = this.bookmarkRepository.create({
-            //     user: userSearch,
-            //     idBookmarks: id,
-            // });
+            const bookmarkUser = await this.bookmarkRepository.save(saveBookmark);
 
-            // const bookmarkUser = await this.bookmarkRepository.save(saveBookmark);
-
-            // return {
-            //     message: 'bookmark saved to user',
-            //     bookmark: bookmarkUser,
-            // }
+            return {
+                message: 'Bookmark saved to user',
+                bookmark: bookmarkUser,
+            };
         } catch (error) {
             console.log(error);
-
             throw new BadRequestException(error.message);
         }
     }
