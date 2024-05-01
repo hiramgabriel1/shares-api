@@ -28,7 +28,7 @@ export class PostsController {
   }
 
   @Post('/create-post/:userId')
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   createPostUser(@Param('userId') userId: any, @Body() postData: PostDto) {
     return this.postsService.createPost(userId, postData);
   }

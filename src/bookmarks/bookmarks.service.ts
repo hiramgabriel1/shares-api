@@ -52,32 +52,42 @@ export class BookmarksService {
         return searchUser;
     }
 
+    // ! validar si el usuario ya tiene guardado el bookmark para que no se repita
     async saveBookmark(postID: number, userID: number) {
         try {
-            // const cacheKey = 'bookmarks'
-            // const cacheVerify = await this.cacheChecked.checkCacheStored(cacheKey)
             const bookmarkSearch = await this.validateIfPostExists(postID);
-            console.log(bookmarkSearch);
-
             const userSearch = await this.validateIfUserExists(userID);
-            console.log(userSearch);
-
-            // if (cacheVerify) return await this.cacheManager.get(cacheKey)
-
             const { id } = bookmarkSearch;
+            const verifyBookmark = await this.bookmarkRepository.findOne({
+                relations: ['user'],
+                where: [
+                    { idBookmarks: postID },
+                    { user: userSearch },
+                ]
+            });
+
+            console.log('user search: ', userSearch);
+            console.log('bookmark: ', verifyBookmark.user.bookmarks);
+
+            // if(verifyBookmark.idBookmarks)
+
+            if (verifyBookmark && verifyBookmark.idBookmarks === postID) {
+                return {
+                    message: 'este post ya esta guardado en los bookmarks del usuario',
+                };
+            }
+
             const saveBookmark = this.bookmarkRepository.create({
                 user: userSearch,
                 idBookmarks: id,
             });
+
             const bookmarkUser = await this.bookmarkRepository.save(saveBookmark);
 
-            console.log(saveBookmark);
-
-            // await this.cacheManager.set(cacheKey, bookmarkUser)
             return {
                 message: 'bookmark saved to user',
                 bookmark: bookmarkUser,
-            };
+            }
         } catch (error) {
             console.log(error);
 
@@ -95,7 +105,9 @@ export class BookmarksService {
             });
 
             if (bookmark && bookmark.user && bookmark.user.id === userId) {
-                console.log(`El usuario que creó este marcador fue: ${bookmark.user.id}`);
+                console.log(
+                    `El usuario que creó este marcador fue: ${bookmark.user.id}`,
+                );
 
                 await this.bookmarkRepository.delete(bookmarkID);
                 return {
@@ -111,7 +123,37 @@ export class BookmarksService {
     }
 
     async getBookmarks(userID: number) {
-        // obtener los bookmark por el id del usuario
+        try {
+            const cacheKey = 'bookmarks';
+            const cacheVerify = await this.cacheChecked.checkCacheStored(cacheKey);
+
+            await this.validateIfUserExists(userID);
+
+            const queryBookmarks = await this.bookmarkRepository.findOne({
+                relations: ['user'],
+            });
+
+            if (!queryBookmarks)
+                throw new ForbiddenException('el usuario no contiene ningun bookmark');
+
+            if (cacheVerify) return this.cacheManager.get('bookmarks');
+
+            if (
+                queryBookmarks &&
+                queryBookmarks.user &&
+                queryBookmarks.user.id === userID
+            ) {
+                console.log(
+                    `el usuario que creo el post fue ${queryBookmarks.user.id}`,
+                );
+
+                await this.cacheManager.set(cacheKey, queryBookmarks);
+                return queryBookmarks;
+            }
+        } catch (error) {
+            console.error(error);
+            throw new BadRequestException(error.message);
+        }
     }
 
     async editBookmark(bookmarkID: number, userID: number, bodyBookmark: any) {
