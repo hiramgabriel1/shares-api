@@ -55,8 +55,7 @@ export class BookmarksService {
     // ! validar si el usuario ya tiene guardado el bookmark para que no se repita
     async saveBookmark(postID: number, userID: number) {
         try {
-            // Validar si el post y el usuario existen
-            const bookmarkSearch = await this.validateIfPostExists(postID);
+            await this.validateIfPostExists(postID);
             const userSearch = await this.validateIfUserExists(userID);
 
             // Buscar el usuario y sus marcadores asociados
@@ -70,11 +69,10 @@ export class BookmarksService {
                 (bookmark) => bookmark.idBookmarks === postID,
             );
 
-            if (bookmarkExists) {
+            if (bookmarkExists)
                 throw new Error(
                     'Este post ya está guardado en los bookmarks del usuario',
                 );
-            }
 
             const saveBookmark = this.bookmarkRepository.create({
                 user: userSearch,
